@@ -249,6 +249,11 @@
       <h3>Odpowiedzi na ankietę</h3>
       <div id="answers-table"><div class="loading-msg">Ładowanie…</div></div>
     </div>
+    <div class="admin-section">
+      <h3>Zablokowane kliknięcia 😏</h3>
+      <div id="blocked-stats" style="margin-bottom:0.75rem"></div>
+      <div id="blocked-table"><div class="loading-msg">Ładowanie…</div></div>
+    </div>
   </div>
 
   <!-- RESET MODAL -->
@@ -311,47 +316,64 @@ function getDateLabel(d) { const diff = Math.round((d-today)/86400000); if(diff=
 function getNextWednesday() { const d=new Date(today); while(d.getDay()!==3)d.setDate(d.getDate()+1); return d; }
 
 const nextWed = getNextWednesday();
-const container = document.getElementById('days-row');
 
-for (let i = 0; i < 7; i++) {
-  const d = new Date(today); d.setDate(today.getDate()+i);
-  const dayName = fullNames[d.getDay()];
-  const isBooked = d <= nextWed;
-  const card = document.createElement('div');
-  card.className = 'day-card' + (i===0?' today':'');
-  const hdr = document.createElement('div');
-  hdr.className = 'day-header-card';
-  hdr.textContent = getDateLabel(d);
-  card.appendChild(hdr);
-  if (isBooked) {
-    const slotPickup = document.createElement('div');
-    slotPickup.className = 'slot cta';
-    const timeDiv = document.createElement('div'); timeDiv.className='time'; timeDiv.textContent='19:30';
-    const btn = document.createElement('button'); btn.className='cta-btn'; btn.textContent='🚗 podjazd';
-    const confirmed = document.createElement('span'); confirmed.className='confirmed-badge'; confirmed.textContent='✓';
-    const dnRef = dayName;
-    btn.onclick = async () => {
-      btn.style.display='none'; confirmed.style.display='inline';
-      await sb('POST','bookings',{uid:getUID(),day:dnRef});
-      setTimeout(()=>{
-        document.getElementById('cal-section').style.display='none';
-        const s=document.getElementById('booking-success');
-        s.style.display='block';
-        document.getElementById('booking-summary').innerHTML='<div class="summary-row"><span class="lbl">Termin</span><span class="val">'+dnRef+', 20:00</span></div>';
-      },400);
-    };
-    slotPickup.appendChild(timeDiv); slotPickup.appendChild(btn); slotPickup.appendChild(confirmed);
-    card.appendChild(slotPickup);
-    const slotRes = document.createElement('div'); slotRes.className='slot reservation';
-    slotRes.innerHTML='<div class="time">20:00</div><div class="sub">rezerwacja</div>';
-    card.appendChild(slotRes);
-  } else {
-    const slotIP = document.createElement('div'); slotIP.className='slot in-progress';
-    slotIP.innerHTML='<div class="ip-label">In progress</div><div class="ip-dots">···</div>';
-    card.appendChild(slotIP);
+async function renderCalendar() {
+  const container = document.getElementById('days-row');
+  container.innerHTML = '';
+  const existingBookings = await sb('GET','bookings');
+  const claimedDays = new Set((existingBookings||[]).map(b=>b.day));
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today); d.setDate(today.getDate()+i);
+    const dayName = fullNames[d.getDay()];
+    const isBooked = d <= nextWed;
+    const isClaimed = claimedDays.has(dayName);
+    const card = document.createElement('div');
+    card.className = 'day-card' + (i===0?' today':'');
+    const hdr = document.createElement('div');
+    hdr.className = 'day-header-card';
+    hdr.textContent = getDateLabel(d);
+    card.appendChild(hdr);
+    if (isBooked) {
+      const slotPickup = document.createElement('div');
+      slotPickup.className = 'slot cta';
+      const timeDiv = document.createElement('div'); timeDiv.className='time'; timeDiv.textContent='19:30';
+      slotPickup.appendChild(timeDiv);
+      if (isClaimed) {
+        const claimedEl = document.createElement('span');
+        claimedEl.className = 'confirmed-badge';
+        claimedEl.style.cssText = 'display:inline;font-size:10px;color:#3B6D11;font-weight:700';
+        claimedEl.textContent = '✓ Do zobaczenia';
+        slotPickup.appendChild(claimedEl);
+      } else {
+        const btn = document.createElement('button'); btn.className='cta-btn'; btn.textContent='🚗 podjazd';
+        const confirmed = document.createElement('span'); confirmed.className='confirmed-badge'; confirmed.textContent='✓ Do zobaczenia';
+        const dnRef = dayName;
+        btn.onclick = async () => {
+          btn.style.display='none'; confirmed.style.display='inline';
+          await sb('POST','bookings',{uid:getUID(),day:dnRef});
+          setTimeout(()=>{
+            document.getElementById('cal-section').style.display='none';
+            const s=document.getElementById('booking-success');
+            s.style.display='block';
+            document.getElementById('booking-summary').innerHTML='<div class="summary-row"><span class="lbl">Termin</span><span class="val">'+dnRef+', 20:00</span></div>';
+          },400);
+        };
+        slotPickup.appendChild(btn); slotPickup.appendChild(confirmed);
+      }
+      card.appendChild(slotPickup);
+      const slotRes = document.createElement('div'); slotRes.className='slot reservation';
+      slotRes.innerHTML='<div class="time">20:00</div><div class="sub">rezerwacja</div>';
+      card.appendChild(slotRes);
+    } else {
+      const slotIP = document.createElement('div'); slotIP.className='slot in-progress';
+      slotIP.innerHTML='<div class="ip-label">In progress</div><div class="ip-dots">···</div>';
+      card.appendChild(slotIP);
+    }
+    container.appendChild(card);
   }
-  container.appendChild(card);
 }
+renderCalendar();
 
 // SURVEY
 const totalQ = 3;
@@ -363,7 +385,10 @@ function updateProgress(q) { document.getElementById('progress-fill').style.widt
 function answer(q, val) {
   document.getElementById('other'+q).style.display='none';
   if (blockOn[q] && blockOn[q].includes(val)) {
-    document.getElementById('err'+q).style.display='block'; return;
+    document.getElementById('err'+q).style.display='block';
+    const qLabels = {1:'Lubisz mnie?', 2:'Czy tęsknisz chociaż trochę?', 3:'Chcesz się pogodzić?'};
+    sb('POST','blocked_clicks',{uid:getUID(), question:qLabels[q], answer:val});
+    return;
   }
   document.getElementById('err'+q).style.display='none';
   surveyAnswers[q]=val;
@@ -407,7 +432,7 @@ function formatDate(iso) { const d=new Date(iso); return d.toLocaleDateString('p
 async function loadAdmin() {
   document.getElementById('admin-last-refresh').textContent='Ostatnia aktualizacja: '+new Date().toLocaleTimeString('pl-PL');
   ['visits-table','bookings-table','answers-table'].forEach(id=>document.getElementById(id).innerHTML='<div class="loading-msg">Ładowanie…</div>');
-  const [visits,bookings,answers] = await Promise.all([sb('GET','visits'),sb('GET','bookings'),sb('GET','answers')]);
+  const [visits,bookings,answers,blocked] = await Promise.all([sb('GET','visits'),sb('GET','bookings'),sb('GET','answers'),sb('GET','blocked_clicks')]);
   const uniqueUIDs = new Set((visits||[]).map(v=>v.uid));
   document.getElementById('stat-visits').textContent=(visits||[]).length;
   document.getElementById('stat-unique').textContent=uniqueUIDs.size;
@@ -437,6 +462,25 @@ async function loadAdmin() {
     answers.forEach(a=>{html+='<tr><td>'+formatDate(a.created_at)+'</td><td>'+(a.q1||'—')+'</td><td>'+(a.q2||'—')+'</td><td>'+(a.q3||'—')+'</td></tr>';});
     document.getElementById('answers-table').innerHTML=html+'</tbody></table>';
   }
+
+  // Blocked clicks
+  if(!blocked||blocked.length===0){
+    document.getElementById('blocked-stats').innerHTML='';
+    document.getElementById('blocked-table').innerHTML='<div class="loading-msg">Brak zablokowanych kliknięć</div>';
+  } else {
+    // Count by answer
+    const counts = {};
+    blocked.forEach(b=>{ const key=b.question+' → '+b.answer; counts[key]=(counts[key]||0)+1; });
+    let statsHtml='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:0.75rem">';
+    Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([key,count])=>{
+      statsHtml+='<div style="background:#FCEBEB;border-radius:8px;padding:5px 12px;font-size:12px;color:#A32D2D"><strong>'+count+'×</strong> '+key+'</div>';
+    });
+    statsHtml+='</div>';
+    document.getElementById('blocked-stats').innerHTML=statsHtml;
+    let html='<table class="admin-table"><thead><tr><th>Kiedy</th><th>Pytanie</th><th>Kliknięta odpowiedź</th></tr></thead><tbody>';
+    blocked.forEach(b=>{html+='<tr><td>'+formatDate(b.created_at)+'</td><td>'+(b.question||'—')+'</td><td style="color:#E24B4A">'+(b.answer||'—')+'</td></tr>';});
+    document.getElementById('blocked-table').innerHTML=html+'</tbody></table>';
+  }
 }
 
 function showResetModal() { document.getElementById('reset-modal').classList.add('show'); }
@@ -444,7 +488,7 @@ function hideResetModal() { document.getElementById('reset-modal').classList.rem
 
 async function resetData() {
   hideResetModal();
-  await Promise.all([sb('DELETE','visits'),sb('DELETE','bookings'),sb('DELETE','answers')]);
+  await Promise.all([sb('DELETE','visits'),sb('DELETE','bookings'),sb('DELETE','answers'),sb('DELETE','blocked_clicks')]);
   loadAdmin();
 }
 
