@@ -145,15 +145,21 @@
       </div>
       <div class="section-label">Ten tydzień</div>
       <div class="days-row" id="days-row"></div>
+      <div class="divider" id="confirm-divider" style="display:none"></div>
+      <div id="booking-confirm" style="display:none">
+        <div style="background:#f8fff4;border-radius:12px;padding:1rem 1.25rem;border:0.5px solid #c0ddaa">
+          <div style="font-size:13px;color:#3B6D11;font-weight:700;margin-bottom:0.25rem">✓ Do zobaczenia!</div>
+          <div id="confirm-day-text" style="font-size:13px;color:#1a1a1a;margin-bottom:1rem"></div>
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#aaa;margin-bottom:0.5rem">Jakieś uwagi?</div>
+          <textarea id="booking-note" placeholder="Napisz coś…" style="width:100%;border:0.5px solid #e5e5e5;border-radius:10px;padding:10px 12px;font-family:'Lato',sans-serif;font-size:13px;color:#1a1a1a;resize:none;height:70px;outline:none;transition:border-color 0.15s" onfocus="this.style.borderColor='#3B6D11'" onblur="this.style.borderColor='#e5e5e5'"></textarea>
+          <button onclick="saveNote()" style="margin-top:8px;width:100%;padding:10px;background:#3B6D11;color:#fff;border:none;border-radius:10px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer">Zapisz uwagi</button>
+          <div id="note-saved" style="display:none;text-align:center;font-size:12px;color:#3B6D11;margin-top:8px">✓ Zapisano</div>
+        </div>
+      </div>
       <div class="divider"></div>
       <div class="bottom-note">Zamów podjazd i będę czekał o <strong>19:30</strong> 🚗</div>
     </div>
-
-    <!-- BOOKING SUCCESS -->
-    <div class="success" id="booking-success">
-      <h2>Rezerwacja potwierdzona!</h2>
-      <div class="summary" id="booking-summary"></div>
-      <p>Będę czekał od <strong>19:30</strong> 🚗</p>
+<p>Będę czekał od <strong>19:30</strong> 🚗</p>
     </div>
 
     <!-- SURVEY -->
@@ -304,7 +310,7 @@ function switchTab(tab) {
   document.getElementById('tab-cal').classList.toggle('active', tab === 'cal');
   document.getElementById('tab-survey').classList.toggle('active', tab === 'survey');
   document.getElementById('cal-section').style.display = tab === 'cal' ? 'block' : 'none';
-  document.getElementById('booking-success').style.display = 'none';
+  document.getElementById('booking-confirm').style.display='none'; document.getElementById('confirm-divider').style.display='none';
   document.getElementById('survey-section').style.display = tab === 'survey' ? 'block' : 'none';
 }
 
@@ -352,12 +358,11 @@ async function renderCalendar() {
         btn.onclick = async () => {
           btn.style.display='none'; confirmed.style.display='inline';
           await sb('POST','bookings',{uid:getUID(),day:dnRef});
-          setTimeout(()=>{
-            document.getElementById('cal-section').style.display='none';
-            const s=document.getElementById('booking-success');
-            s.style.display='block';
-            document.getElementById('booking-summary').innerHTML='<div class="summary-row"><span class="lbl">Termin</span><span class="val">'+dnRef+', 20:00</span></div>';
-          },400);
+          window._lastBookedDay = dnRef;
+          document.getElementById('confirm-divider').style.display='block';
+          document.getElementById('booking-confirm').style.display='block';
+          document.getElementById('confirm-day-text').textContent = dnRef + ', 20:00 — będę czekał od 19:30 🚗';
+          document.getElementById('booking-confirm').scrollIntoView({behavior:'smooth',block:'nearest'});
         };
         slotPickup.appendChild(btn); slotPickup.appendChild(confirmed);
       }
@@ -374,6 +379,15 @@ async function renderCalendar() {
   }
 }
 renderCalendar();
+
+async function saveNote() {
+  const note = document.getElementById('booking-note').value.trim();
+  if (!note) return;
+  await sb('POST','bookings',{uid:getUID(), day:(window._lastBookedDay||''), note:note});
+  document.getElementById('note-saved').style.display='block';
+  document.getElementById('booking-note').disabled=true;
+  document.querySelector('#booking-confirm button').style.display='none';
+}
 
 // SURVEY
 const totalQ = 3;
