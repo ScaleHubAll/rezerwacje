@@ -65,16 +65,7 @@
   .error-msg { display: none; background: #FCEBEB; color: #A32D2D; border-radius: 10px; padding: 10px 14px; font-size: 13px; text-align: center; margin-top: 8px; line-height: 1.5; }
 
   /* SUCCESS */
-  .success { display: none; text-align: center; padding: 1rem 0; }
-  .success .gif-wrap-sm { display: flex; justify-content: center; margin-bottom: 1rem; }
-  .success .gif-wrap-sm img { width: 110px; border-radius: 12px; }
-  .success h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; color: #1a1a1a; margin-bottom: 0.5rem; line-height: 1.4; }
-  .success p { font-size: 13px; color: #888; line-height: 1.9; margin-top: 0.75rem; }
-  .summary { background: #f7f7f7; border-radius: 12px; padding: 1rem 1.25rem; margin: 1.25rem 0; text-align: left; }
-  .summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 5px 0; font-size: 13px; border-bottom: 0.5px solid #efefef; gap: 12px; }
-  .summary-row:last-child { border-bottom: none; }
-  .summary-row .lbl { color: #aaa; white-space: nowrap; }
-  .summary-row .val { color: #1a1a1a; font-weight: 500; text-align: right; }
+
 
   /* SURVEY DONE */
   .survey-done { display: none; text-align: center; padding: 1rem 0; }
@@ -362,6 +353,10 @@ async function renderCalendar() {
           btn.style.display='none'; confirmed.style.display='inline';
           await sb('POST','bookings',{uid:getUID(),day:dnRef});
           window._lastBookedDay = dnRef;
+          document.getElementById('booking-note').value='';
+          document.getElementById('booking-note').disabled=false;
+          document.getElementById('note-saved').style.display='none';
+          document.querySelectorAll('#booking-confirm button').forEach(b=>b.style.display='');
           document.getElementById('confirm-divider').style.display='block';
           document.getElementById('booking-confirm').style.display='block';
           document.getElementById('confirm-day-text').textContent = dnRef + ', 20:00 — będę czekał od 19:30 🚗';
