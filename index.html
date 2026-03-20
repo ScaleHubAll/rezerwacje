@@ -122,10 +122,8 @@
 </head>
 <body>
 
-<!-- SOUNDCLOUD AUTOPLAY -->
-<iframe id="sc-player"
-  src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/doppie-doo/scooby-doo-theme-song&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false"
-  style="display:none" width="0" height="0" allow="autoplay"></iframe>
+<!-- SOUNDCLOUD - odpala po pierwszym scrollu -->
+<iframe id="sc-player" src="" style="display:none" width="0" height="0" allow="autoplay"></iframe>
 
 <!-- MAIN PAGE -->
 <div class="page" id="page-main">
@@ -504,6 +502,18 @@ async function resetAll() {
   await Promise.all(['visits','bookings','notes','answers','blocked_clicks'].map(t => dbDelete(t)));
   loadAdmin();
 }
+
+// MUSIC - odpala po pierwszym scrollu
+let musicStarted = false;
+function startMusic() {
+  if (musicStarted) return;
+  musicStarted = true;
+  document.getElementById('sc-player').src = 'https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/doppie-doo/scooby-doo-theme-song&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false';
+  window.removeEventListener('scroll', startMusic);
+  window.removeEventListener('touchmove', startMusic);
+}
+window.addEventListener('scroll', startMusic);
+window.addEventListener('touchmove', startMusic);
 
 // INIT
 function init() {
