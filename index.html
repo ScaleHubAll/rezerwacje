@@ -503,17 +503,15 @@ async function resetAll() {
   loadAdmin();
 }
 
-// MUSIC - odpala po pierwszym scrollu
+// MUSIC - odpala po pierwszej interakcji
 let musicStarted = false;
 function startMusic() {
   if (musicStarted) return;
   musicStarted = true;
   document.getElementById('sc-player').src = 'https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/doppie-doo/scooby-doo-theme-song&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false';
-  window.removeEventListener('scroll', startMusic);
-  window.removeEventListener('touchmove', startMusic);
+  ['click','touchstart','keydown','scroll','touchmove'].forEach(e => window.removeEventListener(e, startMusic));
 }
-window.addEventListener('scroll', startMusic);
-window.addEventListener('touchmove', startMusic);
+['click','touchstart','keydown','scroll','touchmove'].forEach(e => window.addEventListener(e, startMusic, {once:true}));
 
 // INIT
 function init() {
