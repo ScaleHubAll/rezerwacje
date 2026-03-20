@@ -350,9 +350,9 @@ async function renderCalendar() {
         btn.onclick = async () => {
           btn.style.display='none'; confirmed.style.display='inline';
           await sb('POST','bookings',{uid:getUID(),day:dnRef});
-          window._lastBookedDay = dnRef;
           document.getElementById('booking-note').value='';
           document.getElementById('booking-note').disabled=false;
+          document.getElementById('booking-note').dataset.day=dnRef;
           document.getElementById('note-saved').style.display='none';
           document.querySelectorAll('#booking-confirm button').forEach(b=>b.style.display='');
           document.getElementById('confirm-divider').style.display='block';
@@ -377,13 +377,15 @@ async function renderCalendar() {
 renderCalendar();
 
 async function saveNote() {
-  const note = document.getElementById('booking-note').value.trim();
-  if (note) {
-    // Save note as separate notes record
-    await sb('POST','notes',{uid:getUID(), day:(window._lastBookedDay||''), note:note});
+  const textarea = document.getElementById('booking-note');
+  const note = textarea.value.trim();
+  const day = textarea.dataset.day || '';
+  if (note && day) {
+    const resp = await sb('POST','notes',{uid:getUID(), day:day, note:note});
+    console.log('note saved, status:', resp.status);
   }
   document.getElementById('note-saved').style.display='block';
-  document.getElementById('booking-note').disabled=true;
+  textarea.disabled=true;
   document.querySelectorAll('#booking-confirm button').forEach(b=>b.style.display='none');
 }
 
