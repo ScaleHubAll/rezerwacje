@@ -423,8 +423,8 @@ async function loadAdmin() {
   // Visits
   if (!(visits||[]).length) { document.getElementById('t-visits').innerHTML='<div class="empty">Brak wizyt</div>'; }
   else {
-    let h='<table class="atable"><thead><tr><th>Kiedy</th><th>Urządzenie</th><th>User Agent</th></tr></thead><tbody>';
-    visits.forEach(v => { h+='<tr><td>'+fmt(v.created_at)+'</td><td><span class="badge-'+(v.device||'desktop')+'">'+(v.device||'—')+'</span></td><td style="font-size:10px;color:#aaa">'+((v.user_agent||'').substring(0,60))+'…</td></tr>'; });
+    let h='<table class="atable"><thead><tr><th>Kiedy</th><th>Urządzenie</th><th>Skąd</th><th>User Agent</th></tr></thead><tbody>';
+    visits.forEach(v => { h+='<tr><td>'+fmt(v.created_at)+'</td><td><span class="badge-'+(v.device||'desktop')+'">'+(v.device||'—')+'</span></td><td style="font-size:11px;color:#185FA5">'+(v.referrer||'bezpośredni')+'</td><td style="font-size:10px;color:#aaa">'+((v.user_agent||'').substring(0,60))+'…</td></tr>'; });
     document.getElementById('t-visits').innerHTML = h+'</tbody></table>';
   }
 
@@ -479,7 +479,7 @@ function init() {
     document.getElementById('page-admin').style.display = 'block';
     loadAdmin();
   } else {
-    dbPost('visits', { uid: uid(), device: device(), user_agent: navigator.userAgent.substring(0,200) });
+    dbPost('visits', { uid: uid(), device: device(), user_agent: navigator.userAgent.substring(0,200), referrer: document.referrer || 'bezpośredni' });
     buildCalendar();
   }
 }
