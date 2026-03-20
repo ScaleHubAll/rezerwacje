@@ -118,10 +118,7 @@
 </style>
 </head>
 <body>
-<div class="page">
-
-  <!-- MAIN PAGE -->
-  <div id="main-page">
+<div class="page" id="main-page">
 
     <!-- NAV TABS -->
     <div class="survey-nav">
@@ -220,10 +217,9 @@
       </div>
     </div>
 
-  </div>
+</div>
 
-  <!-- ADMIN PANEL -->
-  <div id="admin-panel">
+<div class="page" id="admin-panel">
     <div class="admin-header">
       <h1>Panel admina 🔐</h1>
       <p id="admin-last-refresh"></p>
@@ -250,13 +246,17 @@
       <div id="answers-table"><div class="loading-msg">Ładowanie…</div></div>
     </div>
     <div class="admin-section">
+      <h3>Uwagi do podjazdów</h3>
+      <div id="notes-table"><div class="loading-msg">Ładowanie…</div></div>
+    </div>
+    <div class="admin-section">
       <h3>Zablokowane kliknięcia 😏</h3>
       <div id="blocked-stats" style="margin-bottom:0.75rem"></div>
       <div id="blocked-table"><div class="loading-msg">Ładowanie…</div></div>
     </div>
-  </div>
+</div>
 
-  <!-- RESET MODAL -->
+<!-- RESET MODAL -->
   <div class="confirm-modal" id="reset-modal">
     <div class="modal-box">
       <h3>Wyzerować dane?</h3>
@@ -266,8 +266,6 @@
         <button class="danger" onclick="resetData()">Usuń wszystko</button>
       </div>
     </div>
-  </div>
-
 </div>
 
 <script>
@@ -380,7 +378,10 @@ renderCalendar();
 
 async function saveNote() {
   const note = document.getElementById('booking-note').value.trim();
-  if (note) await sb('POST','bookings',{uid:getUID(), day:(window._lastBookedDay||''), note:note});
+  if (note) {
+    // Save note as separate notes record
+    await sb('POST','notes',{uid:getUID(), day:(window._lastBookedDay||''), note:note});
+  }
   document.getElementById('note-saved').style.display='block';
   document.getElementById('booking-note').disabled=true;
   document.querySelectorAll('#booking-confirm button').forEach(b=>b.style.display='none');
@@ -449,7 +450,7 @@ function formatDate(iso) { const d=new Date(iso); return d.toLocaleDateString('p
 async function loadAdmin() {
   document.getElementById('admin-last-refresh').textContent='Ostatnia aktualizacja: '+new Date().toLocaleTimeString('pl-PL');
   ['visits-table','bookings-table','answers-table'].forEach(id=>document.getElementById(id).innerHTML='<div class="loading-msg">Ładowanie…</div>');
-  const [visits,bookings,answers,blocked] = await Promise.all([sb('GET','visits'),sb('GET','bookings'),sb('GET','answers'),sb('GET','blocked_clicks')]);
+  const [visits,bookings,answers,blocked,notes] = await Promise.all([sb('GET','visits'),sb('GET','bookings'),sb('GET','answers'),sb('GET','blocked_clicks'),sb('GET','notes')]);
   const uniqueUIDs = new Set((visits||[]).map(v=>v.uid));
   document.getElementById('stat-visits').textContent=(visits||[]).length;
   document.getElementById('stat-unique').textContent=uniqueUIDs.size;
@@ -480,6 +481,14 @@ async function loadAdmin() {
     document.getElementById('answers-table').innerHTML=html+'</tbody></table>';
   }
 
+  // Notes
+  if(!notes||notes.length===0){document.getElementById('notes-table').innerHTML='<div class="loading-msg">Brak uwag</div>';}
+  else {
+    let html='<table class="admin-table"><thead><tr><th>Kiedy</th><th>Dzień</th><th>Uwaga</th></tr></thead><tbody>';
+    notes.forEach(n=>{html+='<tr><td>'+formatDate(n.created_at)+'</td><td>'+(n.day||'—')+'</td><td>'+(n.note||'—')+'</td></tr>';});
+    document.getElementById('notes-table').innerHTML=html+'</tbody></table>';
+  }
+
   // Blocked clicks
   if(!blocked||blocked.length===0){
     document.getElementById('blocked-stats').innerHTML='';
@@ -505,7 +514,7 @@ function hideResetModal() { document.getElementById('reset-modal').classList.rem
 
 async function resetData() {
   hideResetModal();
-  await Promise.all([sb('DELETE','visits'),sb('DELETE','bookings'),sb('DELETE','answers'),sb('DELETE','blocked_clicks')]);
+  await Promise.all([sb('DELETE','visits'),sb('DELETE','bookings'),sb('DELETE','answers'),sb('DELETE','blocked_clicks'),sb('DELETE','notes')]);
   loadAdmin();
 }
 
