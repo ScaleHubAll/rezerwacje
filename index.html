@@ -3,534 +3,495 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moje plany dla nas</title>
+<title>Zamów podjazd</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Lato:wght@300;400;700&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Lato', sans-serif; background: #fdf8f5; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem 4rem; }
-  .page { background: #fff; border-radius: 16px; padding: 2rem 1.5rem 2.5rem; max-width: 600px; width: 100%; box-shadow: 0 2px 24px rgba(0,0,0,0.07); }
 
+  body { font-family: 'Lato', sans-serif; background: #fdf8f5; min-height: 100vh; display: flex; justify-content: center; padding: 2rem 1rem 4rem; }
+
+  .page { background: #fff; border-radius: 16px; padding: 2rem 1.5rem 2.5rem; max-width: 600px; width: 100%; box-shadow: 0 2px 24px rgba(0,0,0,0.07); align-self: flex-start; }
+
+  /* NAV */
+  .tabs { display: flex; justify-content: center; margin-bottom: 1.5rem; }
+  .tab { background: none; border: 0.5px solid #e5e5e5; padding: 8px 20px; font-family: 'Lato', sans-serif; font-size: 13px; color: #888; cursor: pointer; transition: all 0.15s; }
+  .tab:first-child { border-radius: 8px 0 0 8px; }
+  .tab:last-child { border-radius: 0 8px 8px 0; border-left: none; }
+  .tab.active { background: #D4537E; border-color: #D4537E; color: #fff; }
+
+  /* HEADER */
   .header { text-align: center; margin-bottom: 1.5rem; }
-  .gif-wrap { display: flex; justify-content: center; margin-bottom: 0.75rem; }
-  .gif-wrap img { width: 130px; height: auto; border-radius: 12px; }
-  .header h1 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; color: #1a1a1a; margin-bottom: 0.4rem; }
-  .header p { font-size: 13px; color: #888; line-height: 1.6; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; color: #1a1a1a; }
+  .header p { font-size: 13px; color: #888; margin-top: 4px; line-height: 1.6; }
 
+  /* CALENDAR */
   .section-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #aaa; margin-bottom: 0.75rem; }
-
   .days-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 1.5rem; }
   .day-card { border: 0.5px solid #e5e5e5; border-radius: 12px; overflow: hidden; min-width: 0; }
-  .day-header-card { padding: 7px 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; background: #f7f7f7; color: #999; border-bottom: 0.5px solid #e5e5e5; text-align: center; }
-  .day-card.today .day-header-card { background: #FBEAF0; color: #D4537E; }
-  .slot { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 6px; font-size: 11px; border-bottom: 0.5px solid #f0f0f0; text-align: center; min-height: 44px; }
+  .day-head { padding: 7px 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; background: #f7f7f7; color: #999; border-bottom: 0.5px solid #e5e5e5; text-align: center; }
+  .day-card.today .day-head { background: #FBEAF0; color: #D4537E; }
+  .slot { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; text-align: center; min-height: 44px; border-bottom: 0.5px solid #f0f0f0; }
   .slot:last-child { border-bottom: none; }
   .slot .time { font-size: 12px; font-weight: 500; color: #1a1a1a; }
-  .slot .sub { font-size: 9px; color: #aaa; margin-top: 2px; }
-  .slot.reservation .time { color: #888; font-weight: 400; }
-  .slot.reservation .sub { color: #ccc; }
-  .slot.cta { background: #f8fff4; gap: 6px; padding: 8px 6px; }
-  .slot.cta .time { color: #3B6D11; }
-  .cta-btn { display: inline-block; background: #3B6D11; color: #fff; font-size: 9px; padding: 3px 7px; border-radius: 20px; cursor: pointer; font-family: 'Lato', sans-serif; border: none; transition: background 0.15s; white-space: nowrap; }
-  .cta-btn:hover { background: #27500A; }
-  .confirmed-badge { display: none; font-size: 10px; color: #3B6D11; font-weight: 700; }
-  .slot.in-progress { background: #fffbf0; min-height: 88px; }
-  .slot.in-progress .ip-label { font-size: 9px; color: #BA7517; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
-  .slot.in-progress .ip-dots { font-size: 14px; color: #EF9F27; margin-top: 3px; letter-spacing: 2px; }
+  .slot .sub { font-size: 9px; color: #ccc; margin-top: 2px; }
+  .slot.green { background: #f8fff4; gap: 5px; }
+  .slot.green .time { color: #3B6D11; }
+  .slot.amber { background: #fffbf0; min-height: 88px; }
+  .cta-btn { background: #3B6D11; color: #fff; font-size: 9px; padding: 3px 7px; border-radius: 20px; cursor: pointer; font-family: 'Lato', sans-serif; border: none; white-space: nowrap; }
+  .claimed { font-size: 10px; color: #3B6D11; font-weight: 700; }
+  .ip-label { font-size: 9px; color: #BA7517; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .ip-dots { font-size: 14px; color: #EF9F27; margin-top: 3px; letter-spacing: 2px; }
 
+  /* CONFIRM BOX */
   .divider { height: 0.5px; background: #efefef; margin: 1.25rem 0; }
   .bottom-note { text-align: center; font-size: 13px; color: #888; line-height: 1.8; }
   .bottom-note strong { color: #1a1a1a; }
-
-  /* SURVEY NAV */
-  .survey-nav { display: flex; justify-content: center; margin-bottom: 1.5rem; }
-  .survey-tab { background: none; border: 0.5px solid #e5e5e5; padding: 8px 20px; font-family: 'Lato', sans-serif; font-size: 13px; color: #888; cursor: pointer; transition: all 0.15s; }
-  .survey-tab:first-child { border-radius: 8px 0 0 8px; }
-  .survey-tab:last-child { border-radius: 0 8px 8px 0; border-left: none; }
-  .survey-tab.active { background: #D4537E; border-color: #D4537E; color: #fff; }
+  .confirm-box { background: #f8fff4; border-radius: 12px; padding: 1rem 1.25rem; border: 0.5px solid #c0ddaa; margin-top: 1rem; }
+  .confirm-title { font-size: 13px; color: #3B6D11; font-weight: 700; margin-bottom: 0.25rem; }
+  .confirm-day { font-size: 13px; color: #1a1a1a; margin-bottom: 1rem; }
+  .note-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; margin-bottom: 0.5rem; }
+  .note-textarea { width: 100%; border: 0.5px solid #e5e5e5; border-radius: 10px; padding: 10px 12px; font-family: 'Lato', sans-serif; font-size: 13px; color: #1a1a1a; resize: none; height: 70px; outline: none; }
+  .note-textarea:focus { border-color: #3B6D11; }
+  .note-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .note-btns button { flex: 1; padding: 10px; border-radius: 10px; font-family: 'Lato', sans-serif; font-size: 13px; cursor: pointer; border: none; }
+  .btn-save { background: #3B6D11; color: #fff; }
+  .btn-skip { background: #f0f0f0; color: #888; }
+  .note-ok { display: none; text-align: center; font-size: 12px; color: #3B6D11; margin-top: 8px; }
 
   /* SURVEY */
-  .progress-bar { height: 3px; background: #f0f0f0; border-radius: 3px; margin-bottom: 1.5rem; overflow: hidden; }
-  .progress-fill { height: 100%; background: #D4537E; border-radius: 3px; transition: width 0.4s ease; }
-  .question-block { display: none; }
-  .question-block.active { display: block; }
-  .question-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; color: #1a1a1a; margin-bottom: 1.25rem; line-height: 1.4; text-align: center; }
-  .options-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
-  .opt-btn { padding: 12px 16px; border: 0.5px solid #e5e5e5; border-radius: 12px; background: #fff; font-family: 'Lato', sans-serif; font-size: 13px; color: #1a1a1a; cursor: pointer; transition: all 0.15s; text-align: left; }
-  .opt-btn:hover { border-color: #D4537E; color: #D4537E; }
+  .progress-bar { height: 3px; background: #f0f0f0; border-radius: 3px; margin-bottom: 1.5rem; }
+  .progress-fill { height: 100%; background: #D4537E; border-radius: 3px; transition: width 0.4s; }
+  .q-block { display: none; }
+  .q-block.active { display: block; }
+  .q-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; color: #1a1a1a; margin-bottom: 1.25rem; line-height: 1.4; text-align: center; }
+  .opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt { padding: 12px 16px; border: 0.5px solid #e5e5e5; border-radius: 12px; background: #fff; font-family: 'Lato', sans-serif; font-size: 13px; color: #1a1a1a; cursor: pointer; text-align: left; }
+  .opt:hover { border-color: #D4537E; color: #D4537E; }
   .other-wrap { display: none; margin-top: 8px; }
-  .other-input { width: 100%; border: 0.5px solid #e5e5e5; border-radius: 12px; padding: 10px 14px; font-family: 'Lato', sans-serif; font-size: 13px; color: #1a1a1a; outline: none; transition: border-color 0.15s; }
+  .other-input { width: 100%; border: 0.5px solid #e5e5e5; border-radius: 12px; padding: 10px 14px; font-family: 'Lato', sans-serif; font-size: 13px; outline: none; }
   .other-input:focus { border-color: #D4537E; }
-  .other-confirm { margin-top: 8px; width: 100%; padding: 11px; background: #D4537E; color: #fff; border: none; border-radius: 12px; font-family: 'Lato', sans-serif; font-size: 13px; cursor: pointer; transition: background 0.15s; }
-  .other-confirm:hover { background: #c04470; }
-  .error-msg { display: none; background: #FCEBEB; color: #A32D2D; border-radius: 10px; padding: 10px 14px; font-size: 13px; text-align: center; margin-top: 8px; line-height: 1.5; }
-
-  /* SUCCESS */
-
-
-  /* SURVEY DONE */
+  .other-go { margin-top: 8px; width: 100%; padding: 11px; background: #D4537E; color: #fff; border: none; border-radius: 12px; font-family: 'Lato', sans-serif; font-size: 13px; cursor: pointer; }
+  .err-msg { display: none; background: #FCEBEB; color: #A32D2D; border-radius: 10px; padding: 10px 14px; font-size: 13px; text-align: center; margin-top: 8px; }
   .survey-done { display: none; text-align: center; padding: 1rem 0; }
-  .survey-done h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; color: #1a1a1a; margin-bottom: 0.75rem; }
-  .survey-done p { font-size: 13px; color: #888; line-height: 1.8; }
+  .survey-done h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; color: #1a1a1a; }
 
   /* ADMIN */
-  #admin-panel { display: none; }
   .admin-header { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 0.5px solid #efefef; }
   .admin-header h1 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; color: #1a1a1a; }
   .admin-header p { font-size: 12px; color: #aaa; margin-top: 4px; }
   .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
   .stat-card { background: #f7f7f7; border-radius: 12px; padding: 1rem; text-align: center; }
   .stat-card .num { font-size: 28px; font-weight: 700; color: #1a1a1a; }
-  .stat-card .label { font-size: 11px; color: #aaa; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .admin-section { margin-bottom: 1.5rem; }
-  .admin-section h3 { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #aaa; margin-bottom: 0.75rem; }
-  .admin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .admin-table th { text-align: left; padding: 6px 8px; color: #aaa; font-weight: 400; border-bottom: 0.5px solid #efefef; font-size: 11px; }
-  .admin-table td { padding: 8px 8px; border-bottom: 0.5px solid #f5f5f5; color: #1a1a1a; vertical-align: top; }
-  .admin-table tr:last-child td { border-bottom: none; }
-  .device-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
-  .device-badge.mobile { background: #EAF3DE; color: #3B6D11; }
-  .device-badge.desktop { background: #E6F1FB; color: #185FA5; }
-  .admin-btn-row { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
-  .refresh-btn { background: none; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 7px 16px; font-size: 12px; color: #888; cursor: pointer; font-family: 'Lato', sans-serif; transition: all 0.15s; }
-  .refresh-btn:hover { border-color: #D4537E; color: #D4537E; }
-  .reset-btn { background: none; border: 0.5px solid #E24B4A; border-radius: 8px; padding: 7px 16px; font-size: 12px; color: #E24B4A; cursor: pointer; font-family: 'Lato', sans-serif; transition: all 0.15s; }
-  .reset-btn:hover { background: #FCEBEB; }
-  .loading-msg { text-align: center; font-size: 13px; color: #aaa; padding: 1rem 0; }
-  .confirm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
-  .confirm-modal.show { display: flex; }
-  .modal-box { background: #fff; border-radius: 16px; padding: 1.5rem; max-width: 320px; width: 90%; text-align: center; }
-  .modal-box h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; color: #1a1a1a; margin-bottom: 0.5rem; }
-  .modal-box p { font-size: 13px; color: #888; margin-bottom: 1.25rem; line-height: 1.6; }
+  .stat-card .lbl { font-size: 11px; color: #aaa; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .admin-btns { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+  .btn-refresh { background: none; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 7px 16px; font-size: 12px; color: #888; cursor: pointer; font-family: 'Lato', sans-serif; }
+  .btn-refresh:hover { border-color: #D4537E; color: #D4537E; }
+  .btn-reset { background: none; border: 0.5px solid #E24B4A; border-radius: 8px; padding: 7px 16px; font-size: 12px; color: #E24B4A; cursor: pointer; font-family: 'Lato', sans-serif; }
+  .btn-reset:hover { background: #FCEBEB; }
+  .asec { margin-bottom: 1.5rem; }
+  .asec h3 { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #aaa; margin-bottom: 0.75rem; }
+  .atable { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .atable th { text-align: left; padding: 6px 8px; color: #aaa; font-weight: 400; border-bottom: 0.5px solid #efefef; font-size: 11px; }
+  .atable td { padding: 8px; border-bottom: 0.5px solid #f5f5f5; color: #1a1a1a; vertical-align: top; }
+  .atable tr:last-child td { border-bottom: none; }
+  .badge-mobile { background: #EAF3DE; color: #3B6D11; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
+  .badge-desktop { background: #E6F1FB; color: #185FA5; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
+  .empty { text-align: center; font-size: 13px; color: #aaa; padding: 1rem 0; }
+  .blocked-counts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.75rem; }
+  .blocked-pill { background: #FCEBEB; border-radius: 8px; padding: 5px 12px; font-size: 12px; color: #A32D2D; }
+
+  /* MODAL */
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+  .modal-bg.show { display: flex; }
+  .modal { background: #fff; border-radius: 16px; padding: 1.5rem; max-width: 320px; width: 90%; text-align: center; }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; color: #1a1a1a; margin-bottom: 0.5rem; }
+  .modal p { font-size: 13px; color: #888; margin-bottom: 1.25rem; line-height: 1.6; }
   .modal-btns { display: flex; gap: 8px; }
-  .modal-btns button { flex: 1; padding: 10px; border-radius: 10px; font-family: 'Lato', sans-serif; font-size: 13px; cursor: pointer; border: 0.5px solid #e5e5e5; background: #fff; color: #888; transition: all 0.15s; }
+  .modal-btns button { flex: 1; padding: 10px; border-radius: 10px; font-family: 'Lato', sans-serif; font-size: 13px; cursor: pointer; border: 0.5px solid #e5e5e5; background: #fff; color: #888; }
   .modal-btns .danger { background: #E24B4A; border-color: #E24B4A; color: #fff; }
-  .modal-btns .danger:hover { background: #c03a3a; }
 
   @media (max-width: 480px) {
-    .stat-grid { gap: 6px; }
-    .stat-card .num { font-size: 22px; }
     .days-row { gap: 4px; }
-    .day-header-card { font-size: 9px; padding: 5px 3px; }
+    .day-head { font-size: 9px; padding: 5px 3px; }
     .slot { padding: 6px 3px; }
     .slot .time { font-size: 10px; }
     .cta-btn { font-size: 8px; padding: 2px 5px; }
+    .stat-card .num { font-size: 22px; }
   }
 </style>
 </head>
 <body>
-<div class="page" id="main-page">
 
-    <!-- NAV TABS -->
-    <div class="survey-nav">
-      <button class="survey-tab active" id="tab-cal" onclick="switchTab('cal')">📅 Kalendarz</button>
-      <button class="survey-tab" id="tab-survey" onclick="switchTab('survey')">📋 Ankieta</button>
-    </div>
+<!-- MAIN PAGE -->
+<div class="page" id="page-main">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('cal')">📅 Kalendarz</button>
+    <button class="tab" onclick="showTab('survey')">📋 Ankieta</button>
+  </div>
 
-    <!-- CALENDAR -->
-    <div id="cal-section">
-      <div class="header">
-        <h1>Zamów podjazd</h1>
-      </div>
-      <div class="section-label">Ten tydzień</div>
-      <div class="days-row" id="days-row"></div>
-      <div class="divider" id="confirm-divider" style="display:none"></div>
-      <div id="booking-confirm" style="display:none">
-        <div style="background:#f8fff4;border-radius:12px;padding:1rem 1.25rem;border:0.5px solid #c0ddaa">
-          <div style="font-size:13px;color:#3B6D11;font-weight:700;margin-bottom:0.25rem">✓ Do zobaczenia!</div>
-          <div id="confirm-day-text" style="font-size:13px;color:#1a1a1a;margin-bottom:1rem"></div>
-          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#aaa;margin-bottom:0.5rem">Jakieś uwagi?</div>
-          <textarea id="booking-note" placeholder="Opcjonalnie…" style="width:100%;border:0.5px solid #e5e5e5;border-radius:10px;padding:10px 12px;font-family:'Lato',sans-serif;font-size:13px;color:#1a1a1a;resize:none;height:70px;outline:none;transition:border-color 0.15s" onfocus="this.style.borderColor='#3B6D11'" onblur="this.style.borderColor='#e5e5e5'"></textarea>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button onclick="saveNote()" style="flex:1;padding:10px;background:#3B6D11;color:#fff;border:none;border-radius:10px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer">Zapisz uwagi</button>
-            <button onclick="skipNote()" style="flex:1;padding:10px;background:#f0f0f0;color:#888;border:none;border-radius:10px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer">Bez uwag</button>
-          </div>
-          <div id="note-saved" style="display:none;text-align:center;font-size:12px;color:#3B6D11;margin-top:8px">✓ Gotowe!</div>
-        </div>
-      </div>
-      <div class="divider"></div>
-      <div class="bottom-note">Zamów podjazd i będę czekał o <strong>19:30</strong> 🚗</div>
-    </div>
-<p>Będę czekał od <strong>19:30</strong> 🚗</p>
-    </div>
+  <!-- CALENDAR VIEW -->
+  <div id="view-cal">
+    <div class="header"><h1>Zamów podjazd</h1></div>
+    <div class="section-label">Ten tydzień</div>
+    <div class="days-row" id="days-row"></div>
 
-    <!-- SURVEY -->
-    <div id="survey-section" style="display:none;">
-      <div class="header">
-        <h1>Krótka ankieta</h1>
-        <p>Odpowiedz szczerze 😏</p>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-
-      <!-- Q1 -->
-      <div class="question-block active" id="q1">
-        <div class="question-text">Lubisz mnie?</div>
-        <div class="options-list">
-          <button class="opt-btn" onclick="answer(1,'Nienawidzę')">Nienawidzę</button>
-          <button class="opt-btn" onclick="answer(1,'Nie')">Nie</button>
-          <button class="opt-btn" onclick="answer(1,'Trochę')">Trochę</button>
-          <button class="opt-btn" onclick="answer(1,'Tak')">Tak</button>
-          <button class="opt-btn" onclick="answer(1,'Bardzo')">Bardzo</button>
-          <button class="opt-btn" onclick="showOther(1)">Inne…</button>
+    <div id="confirm-box" style="display:none">
+      <div class="confirm-box">
+        <div class="confirm-title">✓ Do zobaczenia!</div>
+        <div class="confirm-day" id="confirm-day-text"></div>
+        <div class="note-label">Jakieś uwagi?</div>
+        <textarea class="note-textarea" id="note-textarea" placeholder="Opcjonalnie…"></textarea>
+        <div class="note-btns">
+          <button class="btn-save" onclick="saveNote()">Zapisz uwagi</button>
+          <button class="btn-skip" onclick="skipNote()">Bez uwag</button>
         </div>
-        <div class="other-wrap" id="other1">
-          <input class="other-input" id="other-input1" type="text" placeholder="Wpisz swoją odpowiedź…" />
-          <button class="other-confirm" onclick="submitOther(1)">Dalej →</button>
-        </div>
-        <div class="error-msg" id="err1">🚨 Proszę nie kłamać. Spróbuj jeszcze raz.</div>
-      </div>
-
-      <!-- Q2 -->
-      <div class="question-block" id="q2">
-        <div class="question-text">Czy tęsknisz chociaż trochę?</div>
-        <div class="options-list">
-          <button class="opt-btn" onclick="answer(2,'Nie')">Nie</button>
-          <button class="opt-btn" onclick="answer(2,'Trochę')">Trochę</button>
-          <button class="opt-btn" onclick="answer(2,'Tak')">Tak</button>
-          <button class="opt-btn" onclick="showOther(2)">Inne…</button>
-        </div>
-        <div class="other-wrap" id="other2">
-          <input class="other-input" id="other-input2" type="text" placeholder="Wpisz swoją odpowiedź…" />
-          <button class="other-confirm" onclick="submitOther(2)">Dalej →</button>
-        </div>
-        <div class="error-msg" id="err2">🚨 Proszę nie kłamać. Spróbuj jeszcze raz.</div>
-      </div>
-
-      <!-- Q3 -->
-      <div class="question-block" id="q3">
-        <div class="question-text">Chcesz się pogodzić?</div>
-        <div class="options-list">
-          <button class="opt-btn" onclick="answer(3,'Nie')">Nie</button>
-          <button class="opt-btn" onclick="answer(3,'Morze?')">Może <small style="color:#aaa">(Morze?)</small></button>
-          <button class="opt-btn" onclick="answer(3,'Tak')">Tak</button>
-          <button class="opt-btn" onclick="showOther(3)">Inne…</button>
-        </div>
-        <div class="other-wrap" id="other3">
-          <input class="other-input" id="other-input3" type="text" placeholder="Wpisz swoją odpowiedź…" />
-          <button class="other-confirm" onclick="submitOther(3)">Dalej →</button>
-        </div>
-        <div class="error-msg" id="err3">🚨 Proszę nie kłamać. Spróbuj jeszcze raz.</div>
-      </div>
-
-      <!-- SURVEY DONE -->
-      <div class="survey-done" id="survey-done">
-        <h2>Dziękuję!</h2>
+        <div class="note-ok" id="note-ok">✓ Gotowe!</div>
       </div>
     </div>
 
+    <div class="divider"></div>
+    <div class="bottom-note">Zamów podjazd i będę czekał o <strong>19:30</strong> 🚗</div>
+  </div>
+
+  <!-- SURVEY VIEW -->
+  <div id="view-survey" style="display:none">
+    <div class="header"><h1>Krótka ankieta</h1><p>Odpowiedz szczerze 😏</p></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+
+    <div class="q-block active" id="q1">
+      <div class="q-text">Lubisz mnie?</div>
+      <div class="opts">
+        <button class="opt" onclick="ans(1,'Nienawidzę')">Nienawidzę</button>
+        <button class="opt" onclick="ans(1,'Nie')">Nie</button>
+        <button class="opt" onclick="ans(1,'Trochę')">Trochę</button>
+        <button class="opt" onclick="ans(1,'Tak')">Tak</button>
+        <button class="opt" onclick="ans(1,'Bardzo')">Bardzo</button>
+        <button class="opt" onclick="showOther(1)">Inne…</button>
+      </div>
+      <div class="other-wrap" id="ow1">
+        <input class="other-input" id="oi1" placeholder="Wpisz odpowiedź…">
+        <button class="other-go" onclick="ansOther(1)">Dalej →</button>
+      </div>
+      <div class="err-msg" id="e1">🚨 Proszę nie kłamać. Spróbuj jeszcze raz.</div>
+    </div>
+
+    <div class="q-block" id="q2">
+      <div class="q-text">Czy tęsknisz chociaż trochę?</div>
+      <div class="opts">
+        <button class="opt" onclick="ans(2,'Nie')">Nie</button>
+        <button class="opt" onclick="ans(2,'Trochę')">Trochę</button>
+        <button class="opt" onclick="ans(2,'Tak')">Tak</button>
+        <button class="opt" onclick="showOther(2)">Inne…</button>
+      </div>
+      <div class="other-wrap" id="ow2">
+        <input class="other-input" id="oi2" placeholder="Wpisz odpowiedź…">
+        <button class="other-go" onclick="ansOther(2)">Dalej →</button>
+      </div>
+      <div class="err-msg" id="e2">🚨 Proszę nie kłamać. Spróbuj jeszcze raz.</div>
+    </div>
+
+    <div class="q-block" id="q3">
+      <div class="q-text">Chcesz się pogodzić?</div>
+      <div class="opts">
+        <button class="opt" onclick="ans(3,'Nie')">Nie</button>
+        <button class="opt" onclick="ans(3,'Może')">Może <small style="color:#aaa">(Morze?)</small></button>
+        <button class="opt" onclick="ans(3,'Tak')">Tak</button>
+        <button class="opt" onclick="showOther(3)">Inne…</button>
+      </div>
+      <div class="other-wrap" id="ow3">
+        <input class="other-input" id="oi3" placeholder="Wpisz odpowiedź…">
+        <button class="other-go" onclick="ansOther(3)">Dalej →</button>
+      </div>
+      <div class="err-msg" id="e3">🚨 Proszę nie kłamać. Spróbuj jeszcze raz.</div>
+    </div>
+
+    <div class="survey-done" id="survey-done">
+      <h2>Dziękuję!</h2>
+    </div>
+  </div>
 </div>
 
-<div class="page" id="admin-panel">
-    <div class="admin-header">
-      <h1>Panel admina 🔐</h1>
-      <p id="admin-last-refresh"></p>
-    </div>
-    <div class="admin-btn-row">
-      <button class="refresh-btn" onclick="loadAdmin()">↻ Odśwież dane</button>
-      <button class="reset-btn" onclick="showResetModal()">🗑 Wyzeruj dane</button>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="num" id="stat-visits">—</div><div class="label">Wizyty</div></div>
-      <div class="stat-card"><div class="num" id="stat-unique">—</div><div class="label">Unikalni</div></div>
-      <div class="stat-card"><div class="num" id="stat-bookings">—</div><div class="label">Podjazdy</div></div>
-    </div>
-    <div class="admin-section">
-      <h3>Wizyty</h3>
-      <div id="visits-table"><div class="loading-msg">Ładowanie…</div></div>
-    </div>
-    <div class="admin-section">
-      <h3>Zamówione podjazdy</h3>
-      <div id="bookings-table"><div class="loading-msg">Ładowanie…</div></div>
-    </div>
-    <div class="admin-section">
-      <h3>Odpowiedzi na ankietę</h3>
-      <div id="answers-table"><div class="loading-msg">Ładowanie…</div></div>
-    </div>
-    <div class="admin-section">
-      <h3>Uwagi do podjazdów</h3>
-      <div id="notes-table"><div class="loading-msg">Ładowanie…</div></div>
-    </div>
-    <div class="admin-section">
-      <h3>Zablokowane kliknięcia 😏</h3>
-      <div id="blocked-stats" style="margin-bottom:0.75rem"></div>
-      <div id="blocked-table"><div class="loading-msg">Ładowanie…</div></div>
-    </div>
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin" style="display:none">
+  <div class="admin-header">
+    <h1>Panel admina 🔐</h1>
+    <p id="admin-ts"></p>
+  </div>
+  <div class="admin-btns">
+    <button class="btn-refresh" onclick="loadAdmin()">↻ Odśwież</button>
+    <button class="btn-reset" onclick="document.getElementById('modal-reset').classList.add('show')">🗑 Wyzeruj dane</button>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="num" id="s-visits">—</div><div class="lbl">Wizyty</div></div>
+    <div class="stat-card"><div class="num" id="s-unique">—</div><div class="lbl">Unikalni</div></div>
+    <div class="stat-card"><div class="num" id="s-bookings">—</div><div class="lbl">Podjazdy</div></div>
+  </div>
+  <div class="asec"><h3>Wizyty</h3><div id="t-visits"><div class="empty">Ładowanie…</div></div></div>
+  <div class="asec"><h3>Zamówione podjazdy</h3><div id="t-bookings"><div class="empty">Ładowanie…</div></div></div>
+  <div class="asec"><h3>Uwagi</h3><div id="t-notes"><div class="empty">Ładowanie…</div></div></div>
+  <div class="asec"><h3>Odpowiedzi na ankietę</h3><div id="t-answers"><div class="empty">Ładowanie…</div></div></div>
+  <div class="asec"><h3>Zablokowane kliknięcia 😏</h3><div class="blocked-counts" id="blocked-counts"></div><div id="t-blocked"><div class="empty">Ładowanie…</div></div></div>
 </div>
 
 <!-- RESET MODAL -->
-  <div class="confirm-modal" id="reset-modal">
-    <div class="modal-box">
-      <h3>Wyzerować dane?</h3>
-      <p>Usunie wszystkie wizyty, podjazdy i odpowiedzi. Tej operacji nie można cofnąć.</p>
-      <div class="modal-btns">
-        <button onclick="hideResetModal()">Anuluj</button>
-        <button class="danger" onclick="resetData()">Usuń wszystko</button>
-      </div>
+<div class="modal-bg" id="modal-reset">
+  <div class="modal">
+    <h3>Wyzerować dane?</h3>
+    <p>Usunie wszystkie wizyty, podjazdy i odpowiedzi.</p>
+    <div class="modal-btns">
+      <button onclick="document.getElementById('modal-reset').classList.remove('show')">Anuluj</button>
+      <button class="danger" onclick="resetAll()">Usuń wszystko</button>
     </div>
+  </div>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://uhmpaaczyvmtmhkamhhm.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_TppSB95ElQ9BABJ_hAKfbg_4gOZdSBj';
+const URL = 'https://uhmpaaczyvmtmhkamhhm.supabase.co/rest/v1/';
+const KEY = 'sb_publishable_TppSB95ElQ9BABJ_hAKfbg_4gOZdSBj';
+const H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' };
 
-function getUID() {
-  let uid = sessionStorage.getItem('uid');
-  if (!uid) { uid = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem('uid', uid); }
-  return uid;
+function uid() {
+  let u = sessionStorage.getItem('_uid');
+  if (!u) { u = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem('_uid', u); }
+  return u;
 }
-function getDevice() { return /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop'; }
+function device() { return /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop'; }
 
-async function sb(method, table, body) {
-  const headers = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' };
-  if (method === 'POST') headers['Prefer'] = 'return=minimal';
-  if (method === 'DELETE') headers['Prefer'] = 'return=minimal';
-  const opts = { method, headers };
-  if (body) opts.body = JSON.stringify(body);
-  let url = SUPABASE_URL + '/rest/v1/' + table;
-  if (method === 'GET') url += '?order=created_at.desc&limit=200';
-  if (method === 'DELETE') url += '?created_at=gte.2000-01-01';
-  const r = await fetch(url, opts);
-  if (method === 'GET') return r.json();
+async function dbGet(table) {
+  const r = await fetch(URL + table + '?order=created_at.desc&limit=200', { headers: H });
+  return r.json();
+}
+async function dbPost(table, data) {
+  const r = await fetch(URL + table, { method: 'POST', headers: { ...H, 'Prefer': 'return=minimal' }, body: JSON.stringify(data) });
   return r;
 }
-
-async function trackVisit() {
-  await sb('POST', 'visits', { uid: getUID(), device: getDevice(), user_agent: navigator.userAgent.substring(0,200) });
+async function dbDelete(table) {
+  await fetch(URL + table + '?created_at=gte.2000-01-01', { method: 'DELETE', headers: { ...H, 'Prefer': 'return=minimal' } });
 }
 
-// TAB SWITCHING
-function switchTab(tab) {
-  document.getElementById('tab-cal').classList.toggle('active', tab === 'cal');
-  document.getElementById('tab-survey').classList.toggle('active', tab === 'survey');
-  document.getElementById('cal-section').style.display = tab === 'cal' ? 'block' : 'none';
-  document.getElementById('booking-confirm').style.display='none'; document.getElementById('confirm-divider').style.display='none';
-  document.getElementById('survey-section').style.display = tab === 'survey' ? 'block' : 'none';
+// TABS
+function showTab(t) {
+  document.querySelectorAll('.tab').forEach((b,i) => b.classList.toggle('active', (i===0&&t==='cal')||(i===1&&t==='survey')));
+  document.getElementById('view-cal').style.display = t==='cal' ? 'block' : 'none';
+  document.getElementById('view-survey').style.display = t==='survey' ? 'block' : 'none';
 }
 
 // CALENDAR
 const today = new Date(); today.setHours(0,0,0,0);
-const shortNames = ['Nd','Pn','Wt','Śr','Cz','Pt','Sb'];
-const fullNames = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
-function getDateLabel(d) { const diff = Math.round((d-today)/86400000); if(diff===0)return'Dziś'; if(diff===1)return'Jutro'; return shortNames[d.getDay()]; }
-function getNextWednesday() { const d=new Date(today); while(d.getDay()!==3)d.setDate(d.getDate()+1); return d; }
+const SN = ['Nd','Pn','Wt','Śr','Cz','Pt','Sb'];
+const FN = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
+function dayLabel(d) { const diff=Math.round((d-today)/86400000); if(diff===0)return'Dziś'; if(diff===1)return'Jutro'; return SN[d.getDay()]; }
+function nextWed() { const d=new Date(today); while(d.getDay()!==3)d.setDate(d.getDate()+1); return d; }
 
-const nextWed = getNextWednesday();
+let currentDay = '';
 
-async function renderCalendar() {
-  const container = document.getElementById('days-row');
-  container.innerHTML = '';
-  const existingBookings = await sb('GET','bookings');
-  const claimedDays = new Set((existingBookings||[]).map(b=>b.day));
-
+async function buildCalendar() {
+  const wed = nextWed();
+  const bookings = await dbGet('bookings');
+  const claimed = new Set((bookings||[]).map(b => b.day));
+  const cont = document.getElementById('days-row');
+  cont.innerHTML = '';
   for (let i = 0; i < 7; i++) {
     const d = new Date(today); d.setDate(today.getDate()+i);
-    const dayName = fullNames[d.getDay()];
-    const isBooked = d <= nextWed;
-    const isClaimed = claimedDays.has(dayName);
+    const name = FN[d.getDay()];
+    const booked = d <= wed;
     const card = document.createElement('div');
     card.className = 'day-card' + (i===0?' today':'');
-    const hdr = document.createElement('div');
-    hdr.className = 'day-header-card';
-    hdr.textContent = getDateLabel(d);
-    card.appendChild(hdr);
-    if (isBooked) {
-      const slotPickup = document.createElement('div');
-      slotPickup.className = 'slot cta';
-      const timeDiv = document.createElement('div'); timeDiv.className='time'; timeDiv.textContent='19:30';
-      slotPickup.appendChild(timeDiv);
-      if (isClaimed) {
-        const claimedEl = document.createElement('span');
-        claimedEl.className = 'confirmed-badge';
-        claimedEl.style.cssText = 'display:inline;font-size:10px;color:#3B6D11;font-weight:700';
-        claimedEl.textContent = '✓ Do zobaczenia';
-        slotPickup.appendChild(claimedEl);
+    const head = document.createElement('div');
+    head.className = 'day-head';
+    head.textContent = dayLabel(d);
+    card.appendChild(head);
+    if (booked) {
+      const s1 = document.createElement('div');
+      s1.className = 'slot green';
+      const t = document.createElement('div'); t.className='time'; t.textContent='19:30';
+      s1.appendChild(t);
+      if (claimed.has(name)) {
+        const c = document.createElement('span'); c.className='claimed'; c.textContent='✓ Do zobaczenia';
+        s1.appendChild(c);
       } else {
         const btn = document.createElement('button'); btn.className='cta-btn'; btn.textContent='🚗 podjazd';
-        const confirmed = document.createElement('span'); confirmed.className='confirmed-badge'; confirmed.textContent='✓ Do zobaczenia';
-        const dnRef = dayName;
         btn.onclick = async () => {
-          btn.style.display='none'; confirmed.style.display='inline';
-          await sb('POST','bookings',{uid:getUID(),day:dnRef});
-          document.getElementById('booking-note').value='';
-          document.getElementById('booking-note').disabled=false;
-          document.getElementById('booking-note').dataset.day=dnRef;
-          document.getElementById('note-saved').style.display='none';
-          document.querySelectorAll('#booking-confirm button').forEach(b=>b.style.display='');
-          document.getElementById('confirm-divider').style.display='block';
-          document.getElementById('booking-confirm').style.display='block';
-          document.getElementById('confirm-day-text').textContent = dnRef + ', 20:00 — będę czekał od 19:30 🚗';
-          document.getElementById('booking-confirm').scrollIntoView({behavior:'smooth',block:'nearest'});
+          btn.style.display='none';
+          const c = document.createElement('span'); c.className='claimed'; c.textContent='✓ Do zobaczenia';
+          s1.appendChild(c);
+          await dbPost('bookings', { uid: uid(), day: name });
+          currentDay = name;
+          // reset confirm box
+          document.getElementById('note-textarea').value = '';
+          document.getElementById('note-textarea').disabled = false;
+          document.getElementById('note-ok').style.display = 'none';
+          document.querySelector('.note-btns').style.display = 'flex';
+          document.getElementById('confirm-day-text').textContent = name + ', 20:00 — będę czekał od 19:30 🚗';
+          document.getElementById('confirm-box').style.display = 'block';
+          setTimeout(() => document.getElementById('confirm-box').scrollIntoView({behavior:'smooth',block:'nearest'}), 50);
         };
-        slotPickup.appendChild(btn); slotPickup.appendChild(confirmed);
+        s1.appendChild(btn);
       }
-      card.appendChild(slotPickup);
-      const slotRes = document.createElement('div'); slotRes.className='slot reservation';
-      slotRes.innerHTML='<div class="time">20:00</div><div class="sub">rezerwacja</div>';
-      card.appendChild(slotRes);
+      card.appendChild(s1);
+      const s2 = document.createElement('div'); s2.className='slot';
+      s2.innerHTML='<div class="time" style="color:#aaa;font-weight:400">20:00</div><div class="sub">rezerwacja</div>';
+      card.appendChild(s2);
     } else {
-      const slotIP = document.createElement('div'); slotIP.className='slot in-progress';
-      slotIP.innerHTML='<div class="ip-label">In progress</div><div class="ip-dots">···</div>';
-      card.appendChild(slotIP);
+      const s = document.createElement('div'); s.className='slot amber';
+      s.innerHTML='<div class="ip-label">In progress</div><div class="ip-dots">···</div>';
+      card.appendChild(s);
     }
-    container.appendChild(card);
+    cont.appendChild(card);
   }
 }
-renderCalendar();
 
 async function saveNote() {
-  const textarea = document.getElementById('booking-note');
-  const note = textarea.value.trim();
-  const day = textarea.dataset.day || '';
-  if (note && day) {
-    const resp = await sb('POST','notes',{uid:getUID(), day:day, note:note});
-    console.log('note saved, status:', resp.status);
+  const note = document.getElementById('note-textarea').value.trim();
+  if (note && currentDay) {
+    await dbPost('notes', { uid: uid(), day: currentDay, note: note });
   }
-  document.getElementById('note-saved').style.display='block';
-  textarea.disabled=true;
-  document.querySelectorAll('#booking-confirm button').forEach(b=>b.style.display='none');
+  document.getElementById('note-textarea').disabled = true;
+  document.querySelector('.note-btns').style.display = 'none';
+  document.getElementById('note-ok').style.display = 'block';
 }
 
 function skipNote() {
-  document.getElementById('note-saved').style.display='block';
-  document.getElementById('booking-note').disabled=true;
-  document.querySelectorAll('#booking-confirm button').forEach(b=>b.style.display='none');
+  document.getElementById('note-textarea').disabled = true;
+  document.querySelector('.note-btns').style.display = 'none';
+  document.getElementById('note-ok').style.display = 'block';
 }
 
 // SURVEY
-const totalQ = 3;
-const surveyAnswers = {};
-const blockOn = { 1:['Nienawidzę','Nie'], 2:['Nie'], 3:['Nie'] };
+const BLOCK = { 1:['Nienawidzę','Nie'], 2:['Nie'], 3:['Nie'] };
+const answers = {};
+const TOTAL = 3;
 
-function updateProgress(q) { document.getElementById('progress-fill').style.width=(((q-1)/totalQ)*100)+'%'; }
-
-function answer(q, val) {
-  document.getElementById('other'+q).style.display='none';
-  if (blockOn[q] && blockOn[q].includes(val)) {
-    document.getElementById('err'+q).style.display='block';
-    const qLabels = {1:'Lubisz mnie?', 2:'Czy tęsknisz chociaż trochę?', 3:'Chcesz się pogodzić?'};
-    sb('POST','blocked_clicks',{uid:getUID(), question:qLabels[q], answer:val});
+function ans(q, val) {
+  document.getElementById('ow'+q).style.display='none';
+  if (BLOCK[q] && BLOCK[q].includes(val)) {
+    document.getElementById('e'+q).style.display='block';
+    dbPost('blocked_clicks', { uid: uid(), question: document.querySelector('#q'+q+' .q-text').textContent, answer: val });
     return;
   }
-  document.getElementById('err'+q).style.display='none';
-  surveyAnswers[q]=val;
-  nextQuestion(q);
+  document.getElementById('e'+q).style.display='none';
+  answers[q] = val;
+  nextQ(q);
 }
 
 function showOther(q) {
-  document.getElementById('err'+q).style.display='none';
-  document.getElementById('other'+q).style.display='block';
-  document.getElementById('other-input'+q).focus();
+  document.getElementById('e'+q).style.display='none';
+  document.getElementById('ow'+q).style.display='block';
+  document.getElementById('oi'+q).focus();
 }
 
-function submitOther(q) {
-  const val = document.getElementById('other-input'+q).value.trim();
-  if (!val) { document.getElementById('other-input'+q).focus(); return; }
-  surveyAnswers[q] = val;
-  nextQuestion(q);
+function ansOther(q) {
+  const val = document.getElementById('oi'+q).value.trim();
+  if (!val) return;
+  answers[q] = val;
+  nextQ(q);
 }
 
-function nextQuestion(q) {
+function nextQ(q) {
   document.getElementById('q'+q).classList.remove('active');
   const next = q+1;
-  if (next<=totalQ) {
+  if (next <= TOTAL) {
     document.getElementById('q'+next).classList.add('active');
-    updateProgress(next);
+    document.getElementById('prog').style.width = (((next-1)/TOTAL)*100)+'%';
   } else {
-    updateProgress(totalQ+1);
+    document.getElementById('prog').style.width = '100%';
     setTimeout(finishSurvey, 300);
   }
 }
 
 async function finishSurvey() {
-  await sb('POST','answers',{uid:getUID(),q1:surveyAnswers[1],q2:surveyAnswers[2],q3:surveyAnswers[3]});
-  document.getElementById('q3').classList.remove('active');
-  document.getElementById('survey-done').style.display='block';
+  await dbPost('answers', { uid: uid(), q1: answers[1], q2: answers[2], q3: answers[3] });
+  document.getElementById('q'+TOTAL).classList.remove('active');
+  document.getElementById('survey-done').style.display = 'block';
 }
 
 // ADMIN
-function formatDate(iso) { const d=new Date(iso); return d.toLocaleDateString('pl-PL')+' '+d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}); }
+function fmt(iso) { const d=new Date(iso); return d.toLocaleDateString('pl-PL')+' '+d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}); }
 
 async function loadAdmin() {
-  document.getElementById('admin-last-refresh').textContent='Ostatnia aktualizacja: '+new Date().toLocaleTimeString('pl-PL');
-  ['visits-table','bookings-table','answers-table'].forEach(id=>document.getElementById(id).innerHTML='<div class="loading-msg">Ładowanie…</div>');
-  const [visits,bookings,answers,blocked,notes] = await Promise.all([sb('GET','visits'),sb('GET','bookings'),sb('GET','answers'),sb('GET','blocked_clicks'),sb('GET','notes')]);
-  const uniqueUIDs = new Set((visits||[]).map(v=>v.uid));
-  document.getElementById('stat-visits').textContent=(visits||[]).length;
-  document.getElementById('stat-unique').textContent=uniqueUIDs.size;
-  document.getElementById('stat-bookings').textContent=(bookings||[]).length;
+  document.getElementById('admin-ts').textContent = 'Ostatnia aktualizacja: ' + new Date().toLocaleTimeString('pl-PL');
+  ['t-visits','t-bookings','t-notes','t-answers','t-blocked'].forEach(id => document.getElementById(id).innerHTML='<div class="empty">Ładowanie…</div>');
 
-  if(!visits||visits.length===0){document.getElementById('visits-table').innerHTML='<div class="loading-msg">Brak wizyt</div>';}
+  const [visits, bookings, notes, answers, blocked] = await Promise.all([
+    dbGet('visits'), dbGet('bookings'), dbGet('notes'), dbGet('answers'), dbGet('blocked_clicks')
+  ]);
+
+  document.getElementById('s-visits').textContent = (visits||[]).length;
+  document.getElementById('s-unique').textContent = new Set((visits||[]).map(v=>v.uid)).size;
+  document.getElementById('s-bookings').textContent = (bookings||[]).length;
+
+  // Visits
+  if (!(visits||[]).length) { document.getElementById('t-visits').innerHTML='<div class="empty">Brak wizyt</div>'; }
   else {
-    let html='<table class="admin-table"><thead><tr><th>Kiedy</th><th>Urządzenie</th><th>User Agent</th></tr></thead><tbody>';
-    visits.forEach(v=>{
-      const badge='<span class="device-badge '+(v.device||'desktop')+'">'+(v.device||'—')+'</span>';
-      const ua=(v.user_agent||'').substring(0,60)+((v.user_agent||'').length>60?'…':'');
-      html+='<tr><td>'+formatDate(v.created_at)+'</td><td>'+badge+'</td><td style="font-size:10px;color:#aaa">'+ua+'</td></tr>';
-    });
-    document.getElementById('visits-table').innerHTML=html+'</tbody></table>';
+    let h='<table class="atable"><thead><tr><th>Kiedy</th><th>Urządzenie</th><th>User Agent</th></tr></thead><tbody>';
+    visits.forEach(v => { h+='<tr><td>'+fmt(v.created_at)+'</td><td><span class="badge-'+(v.device||'desktop')+'">'+(v.device||'—')+'</span></td><td style="font-size:10px;color:#aaa">'+((v.user_agent||'').substring(0,60))+'…</td></tr>'; });
+    document.getElementById('t-visits').innerHTML = h+'</tbody></table>';
   }
 
-  if(!bookings||bookings.length===0){document.getElementById('bookings-table').innerHTML='<div class="loading-msg">Brak zamówionych podjazdów</div>';}
+  // Bookings
+  if (!(bookings||[]).length) { document.getElementById('t-bookings').innerHTML='<div class="empty">Brak podjazdów</div>'; }
   else {
-    let html='<table class="admin-table"><thead><tr><th>Kiedy</th><th>Dzień</th></tr></thead><tbody>';
-    bookings.forEach(b=>{html+='<tr><td>'+formatDate(b.created_at)+'</td><td>'+(b.day||'—')+'</td></tr>';});
-    document.getElementById('bookings-table').innerHTML=html+'</tbody></table>';
-  }
-
-  if(!answers||answers.length===0){document.getElementById('answers-table').innerHTML='<div class="loading-msg">Brak odpowiedzi</div>';}
-  else {
-    let html='<table class="admin-table"><thead><tr><th>Kiedy</th><th>Lubisz mnie?</th><th>Tęsknisz?</th><th>Pogodzić się?</th></tr></thead><tbody>';
-    answers.forEach(a=>{html+='<tr><td>'+formatDate(a.created_at)+'</td><td>'+(a.q1||'—')+'</td><td>'+(a.q2||'—')+'</td><td>'+(a.q3||'—')+'</td></tr>';});
-    document.getElementById('answers-table').innerHTML=html+'</tbody></table>';
+    let h='<table class="atable"><thead><tr><th>Kiedy</th><th>Dzień</th></tr></thead><tbody>';
+    bookings.forEach(b => { h+='<tr><td>'+fmt(b.created_at)+'</td><td>'+(b.day||'—')+'</td></tr>'; });
+    document.getElementById('t-bookings').innerHTML = h+'</tbody></table>';
   }
 
   // Notes
-  if(!notes||notes.length===0){document.getElementById('notes-table').innerHTML='<div class="loading-msg">Brak uwag</div>';}
+  if (!(notes||[]).length) { document.getElementById('t-notes').innerHTML='<div class="empty">Brak uwag</div>'; }
   else {
-    let html='<table class="admin-table"><thead><tr><th>Kiedy</th><th>Dzień</th><th>Uwaga</th></tr></thead><tbody>';
-    notes.forEach(n=>{html+='<tr><td>'+formatDate(n.created_at)+'</td><td>'+(n.day||'—')+'</td><td>'+(n.note||'—')+'</td></tr>';});
-    document.getElementById('notes-table').innerHTML=html+'</tbody></table>';
+    let h='<table class="atable"><thead><tr><th>Kiedy</th><th>Dzień</th><th>Uwaga</th></tr></thead><tbody>';
+    notes.forEach(n => { h+='<tr><td>'+fmt(n.created_at)+'</td><td>'+(n.day||'—')+'</td><td>'+(n.note||'—')+'</td></tr>'; });
+    document.getElementById('t-notes').innerHTML = h+'</tbody></table>';
   }
 
-  // Blocked clicks
-  if(!blocked||blocked.length===0){
-    document.getElementById('blocked-stats').innerHTML='';
-    document.getElementById('blocked-table').innerHTML='<div class="loading-msg">Brak zablokowanych kliknięć</div>';
-  } else {
-    // Count by answer
+  // Answers
+  if (!(answers||[]).length) { document.getElementById('t-answers').innerHTML='<div class="empty">Brak odpowiedzi</div>'; }
+  else {
+    let h='<table class="atable"><thead><tr><th>Kiedy</th><th>Lubisz mnie?</th><th>Tęsknisz?</th><th>Pogodzić się?</th></tr></thead><tbody>';
+    answers.forEach(a => { h+='<tr><td>'+fmt(a.created_at)+'</td><td>'+(a.q1||'—')+'</td><td>'+(a.q2||'—')+'</td><td>'+(a.q3||'—')+'</td></tr>'; });
+    document.getElementById('t-answers').innerHTML = h+'</tbody></table>';
+  }
+
+  // Blocked
+  if (!(blocked||[]).length) { document.getElementById('blocked-counts').innerHTML=''; document.getElementById('t-blocked').innerHTML='<div class="empty">Brak</div>'; }
+  else {
     const counts = {};
-    blocked.forEach(b=>{ const key=b.question+' → '+b.answer; counts[key]=(counts[key]||0)+1; });
-    let statsHtml='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:0.75rem">';
-    Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([key,count])=>{
-      statsHtml+='<div style="background:#FCEBEB;border-radius:8px;padding:5px 12px;font-size:12px;color:#A32D2D"><strong>'+count+'×</strong> '+key+'</div>';
-    });
-    statsHtml+='</div>';
-    document.getElementById('blocked-stats').innerHTML=statsHtml;
-    let html='<table class="admin-table"><thead><tr><th>Kiedy</th><th>Pytanie</th><th>Kliknięta odpowiedź</th></tr></thead><tbody>';
-    blocked.forEach(b=>{html+='<tr><td>'+formatDate(b.created_at)+'</td><td>'+(b.question||'—')+'</td><td style="color:#E24B4A">'+(b.answer||'—')+'</td></tr>';});
-    document.getElementById('blocked-table').innerHTML=html+'</tbody></table>';
+    blocked.forEach(b => { const k=(b.question||'')+'→'+(b.answer||''); counts[k]=(counts[k]||0)+1; });
+    let pills='';
+    Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([k,n]) => { pills+='<div class="blocked-pill"><strong>'+n+'×</strong> '+k+'</div>'; });
+    document.getElementById('blocked-counts').innerHTML = pills;
+    let h='<table class="atable"><thead><tr><th>Kiedy</th><th>Pytanie</th><th>Odpowiedź</th></tr></thead><tbody>';
+    blocked.forEach(b => { h+='<tr><td>'+fmt(b.created_at)+'</td><td>'+(b.question||'—')+'</td><td style="color:#E24B4A">'+(b.answer||'—')+'</td></tr>'; });
+    document.getElementById('t-blocked').innerHTML = h+'</tbody></table>';
   }
 }
 
-function showResetModal() { document.getElementById('reset-modal').classList.add('show'); }
-function hideResetModal() { document.getElementById('reset-modal').classList.remove('show'); }
-
-async function resetData() {
-  hideResetModal();
-  await Promise.all([sb('DELETE','visits'),sb('DELETE','bookings'),sb('DELETE','answers'),sb('DELETE','blocked_clicks'),sb('DELETE','notes')]);
+async function resetAll() {
+  document.getElementById('modal-reset').classList.remove('show');
+  await Promise.all(['visits','bookings','notes','answers','blocked_clicks'].map(t => dbDelete(t)));
   loadAdmin();
 }
 
-// ROUTING
+// INIT
 function init() {
-  if (window.location.hash==='#admin') {
-    document.getElementById('main-page').style.display='none';
-    document.getElementById('admin-panel').style.display='block';
+  if (window.location.hash === '#admin') {
+    document.getElementById('page-main').style.display = 'none';
+    document.getElementById('page-admin').style.display = 'block';
     loadAdmin();
   } else {
-    trackVisit();
+    dbPost('visits', { uid: uid(), device: device(), user_agent: navigator.userAgent.substring(0,200) });
+    buildCalendar();
   }
 }
-window.addEventListener('hashchange',()=>{ if(window.location.hash==='#admin'){document.getElementById('main-page').style.display='none';document.getElementById('admin-panel').style.display='block';loadAdmin();}});
+
+window.addEventListener('hashchange', () => {
+  if (window.location.hash === '#admin') {
+    document.getElementById('page-main').style.display = 'none';
+    document.getElementById('page-admin').style.display = 'block';
+    loadAdmin();
+  }
+});
+
 init();
 </script>
 </body>
